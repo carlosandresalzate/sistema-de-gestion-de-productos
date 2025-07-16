@@ -17,59 +17,57 @@ Una aplicación de consola en Python para gestionar productos en stock de forma 
 ## 📁 Estructura del proyecto
 
 ```
-
-trabajo\_integrador/
+trabajo_integrador/
+├── main.py                       # Punto de entrada de la aplicación
+├── README.md
+├── requirements.txt
+├── .gitignore
 ├── app/
 │   ├── db/
 │   │   └── manager.py            # Conexión y creación de esquema SQLite3
 │   ├── services/
 │   │   └── products.py           # CRUD de productos y lógica de negocio
 │   ├── ui/
-│   │   ├── menu.py               # Menús, entradas y navegación
-│   │   ├── table.py              # Tabla con productos (formato fijo y truncado)
-│   │   ├── message.py            # Colores y mensajes con emojis (info, error, etc.)
-│   │   ├── handler.py            # Coordinador de menús y acciones
-│   │   └── decorators.py         # Estilo de impresión: centrado, boxed, headers
+│   │   ├── config.py             # Configuraciones generales del UI (constantes, columnas)
+│   │   ├── decorators.py         # Estilos: centrado, boxed_text, headers
+│   │   ├── form.py               # Entradas de datos con validación
+│   │   ├── handler.py            # Controlador general del menú y flujo
+│   │   ├── menu.py               # Menús y navegación
+│   │   ├── message.py            # Mensajes con color y emojis (info, warning, error)
+│   │   └── table.py              # Tabla formateada de productos
 │   ├── utils/
-│   │   ├── close\_app.py          # Cierre con mensaje y manejo de errores
-│   │   ├── random\_farewell.py    # Mensajes de despedida aleatorios
-│   │   └── mkdir.py              # Inicialización de carpetas y rutas
+│   │   ├── animation.py          # Animaciones de carga y efecto de salida
+│   │   ├── close_app.py          # Cierre del programa con despedida
+│   │   ├── mkdir.py              # Verifica y crea carpeta `data/`
+│   │   └── random_farewell.py    # Mensajes de despedida aleatorios
 ├── data/
-│   └── inventario.db             # Base de datos SQLite3 (auto creada)
-├── requirements.txt
-└── main.py                       # Punto de entrada
-
+│   └── inventario.db             # Base de datos SQLite3 generada automáticamente
 ```
 
 
 
 ## 🧪 Ejemplo de uso
 
-```
-
-==========================
-📦 GESTIÓN DE PRODUCTOS 📦
-==========================
 
 ```
-Sistema de administración para productos de stock.
-Cargá, buscá, editá y eliminá productos fácilmente.
-
-```
-
+============================================================
+                  📦 GESTIÓN DE PRODUCTOS 📦
+============================================================
+     Sistema de administración para productos de stock.
+    Cargá, buscá, editá y eliminá productos fácilmente.
+------------------------------------------------------------
 ····························································
 ·                      Menu Principal                      ·
 ····························································
-1. Agregar Producto
-2. Mostrar Productos
-3. Editar Producto
-4. Eliminar Producto (soft)
-5. Buscar Producto
-6. Salir
-
+          1. Agregar Producto
+          2. Mostrar Productos
+          3. Editar Producto
+          4. Eliminar Producto (soft)
+          5. Buscar Producto
+          6. Salir
 ```
 
-**Mostrar productos**
+**Muestrar  los productos en una tabla**
 
 ```
 
@@ -81,13 +79,13 @@ Cargá, buscá, editá y eliminá productos fácilmente.
 
 ```
 
-
 ## 🛠️ Tecnologías y librerías
 
 - Python 3.11+
 - SQLite3 (integrado)
 - colorama (colores en terminal)
 - Estructura modular y sin clases (funcional)
+- Funciones decoradoras reutilizables
 - Uso de `match` para navegación
 - Buenas prácticas inspiradas en Angular (separación por módulo)
 
@@ -96,7 +94,7 @@ Cargá, buscá, editá y eliminá productos fácilmente.
 ## 🧠 Conceptos clave aplicados
 
 - Entrada del usuario validada (try/except)
-- Separación UI / lógica / persistencia
+- Separación clara de responsabilidades: UI, lógica, DB, utils, persistencia
 - Diseño para terminal compacta (máximo 60 columnas)
 - Funciones decoradoras reutilizables para estilo
 - Documentación con Google-style docstrings

@@ -1,0 +1,20 @@
+# Entonrno virtual
+.venv/
+venv/
+ENV/
+env/
+
+# Cache de python
+__pychache__/
+__pychache__/**
+*.py[cod]
+*.pyo
+*.pyd
+
+# Archivos de bases de datos
+data/
+*.db
+
+# micellaneous
+labs.py
+TODO.md

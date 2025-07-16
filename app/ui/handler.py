@@ -4,6 +4,7 @@ Script: handler.py
 Muestra el menu principal y maneja la navegacion
 """
 
+from turtle import update
 from app.services.products import (
     create_product,
     delete_product,
@@ -17,6 +18,7 @@ from app.services.products import (
 )
 from app.ui.config import FAREWELL, MAIN_MENU_OPTIONS, SEARCH_OPTIONS, SYMBOL
 from app.ui.decorators import header
+from app.ui.feedback import show_edit_changes
 from app.ui.form import (
     get_category,
     get_price,
@@ -26,7 +28,7 @@ from app.ui.form import (
     get_product_quantity,
 )
 from app.ui.menu import show_menu_options
-from app.ui.message import error, info, warning
+from app.ui.message import error, info, success, warning
 from app.ui.table import print_product_table
 from app.utils.animation import point_animated
 from app.utils.close_app import end_program
@@ -66,15 +68,42 @@ def handle_main_menu(conn, table):
 
         case "Editar Producto":
             print(header("Editar Producto", level=3))
-            header("Editar Producto", level=3)
+
             product_id = ask_product_id()
-            print("product_id", product_id)
             if product_id == "None":
                 return
-            print("product_id: ", product_id)
+            if product_id == "0":
+                return
+
+            product = search_by_id(conn, table, product_id)
+            if not product:
+                message = error("Producto no encontrado.")
+                print(message)
+                return
+
+            # Mostrar datos originales
+            print(info("📝 Producto a editar: ", False))
+            print_product_table(
+                [(product[0], product[1], product[2], product[6], product[4])]
+            )
+
             updates = ask_update_data()
-            print("Editar: ", updates)
-            update_product(conn, product_id, table, updates)
+
+            # mostrar comparativa
+            show_edit_changes(product, updates)
+
+            confirm = input(info("¿confirmar cambios? (S/n)")).strip().lower()
+            if confirm != "s":
+                message = warning("Cambios cancelados")
+                print(message)
+                return
+
+            updated = update_product(conn, product_id, table, updates)
+            if updated:
+                message = success("Producto actualizado correctamente")
+                print(message)
+            else:
+                print(warning("No se realizaron cambios en la base de datos."))
 
         case "Eliminar Producto (soft)":
             product_id = ask_product_id()
@@ -190,7 +219,7 @@ def ask_product_id():
             ).strip()
             if product_id.isdigit():
                 if product_id == "0":
-                    return
+                    return "0"
 
                 product_id_to_number = int(product_id)
                 return product_id_to_number

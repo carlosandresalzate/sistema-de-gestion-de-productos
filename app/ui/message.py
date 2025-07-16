@@ -49,7 +49,7 @@ def warning(msg, emoji=True):
     if emoji:
         return f"⚠ {Fore.YELLOW}{msg}{Fore.RESET}"
     else:
-        f"{Fore.YELLOW}{msg}{Fore.RESET}"
+        return f"{Fore.YELLOW}{msg}{Fore.RESET}"
 
 
 def error(msg, emoji=True):
@@ -57,6 +57,6 @@ def error(msg, emoji=True):
     colorea un mensaje de (error: traducir y mejorar)  para el usuario.
     """
     if emoji:
-        return f"✅ {Fore.YELLOW}{msg}{Fore.RESET}"
+        return f"❌ {Fore.RED}{msg}{Fore.RESET}"
     else:
-        f"{Fore.YELLOW}{msg}{Fore.RESET}"
+        return f"{Fore.RED}{msg}{Fore.RESET}"

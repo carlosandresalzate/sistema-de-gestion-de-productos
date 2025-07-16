@@ -57,12 +57,13 @@ def read_all_products(conn, table, is_active=1):
 
 def update_product(conn, product_id, table, updates):
     """
-    Actualiza campos especificos de un producto
+    Actualiza campos especificos de un producto en la base de datos
 
     Args:
-        conn (sqlite3.Connection): conecciona la base de datos
-        product_id (int): ID unico del producto
-        updates (dict); cambios/actualizaciones a realizar en el producto
+        conn (sqlite3.Connection): conexion activa a la base de datos
+        product_id (int): ID unico del producto a modificar
+        table (str): Nombre de la tabla donde esta el producto.
+        updates (dict): Diccionario con campos a actualizar (eje. {"price": 12.5})
 
     Returns:
         bool: si se actualiza al menos un registro retorna True de lo contrario retorna false
@@ -76,11 +77,8 @@ def update_product(conn, product_id, table, updates):
         return False
 
     fields = ", ".join([f"{k} = ? " for k in updates])
-    print("fields: ", fields)
     values = list(updates.values())
-    print("values (primer llamado): ", values)
     values.append(product_id)
-    print("values, despues de values.append(product_id)", values)
 
     cursor = conn.cursor()
     cursor.execute(

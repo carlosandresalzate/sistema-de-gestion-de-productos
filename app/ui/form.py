@@ -261,34 +261,35 @@ def get_category():
 def get_price():
     """
     Solicita al usuario el precio por unidad del producto
+
+    TODO: Agregar feedback
+        - mensaje con intruciones para cancelar o salir
     """
     while True:
         try:
-            price = input(f"Precio\n{SYMBOL}").strip()
+            price = input(f"Precio\n{SYMBOL} ").strip()
+
             if price == "":
                 return None, price
 
-            if not price.isdigit():
-                print(warning("Ingrese el precio del producto, o 0 para cancelar"))
-                continue
             if price == "0":
-                message = "Cancelando el programa"
-                end_program(message)
+                message = "↩ Volviendo al menú principal"
+                print(message)
+                return "previus", message
 
-            if price.isdigit():
-                try:
-                    price_to_float = float(price)
-                    if price_to_float < 0:
-                        message = "El precio no puede ser negativo"
-                        print(error(message))
-                        continue
-                    return "ok", price_to_float
-                except ValueError:
-                    message = "Precio invalido. Debe ser un numero valido"
-                    print(error(message))
-                except Exception as e:
-                    message = f"Error inesperado: {type(e).__name__}: {e}"
-                    print(error(message))
+            try:
+                price_to_float = float(price)
+                if price_to_float < 0:
+                    message = error("El precio no puede ser negativo")
+                    print(message)
+                    continue
+                return "ok", price_to_float
+            except ValueError:
+                message = error("Ingrese un número válido, usando punto para decimales")
+                print(message)
+            except Exception as e:
+                message = f"Error inesperado: {type(e).__name__}: {e}"
+                print(error(message))
         except KeyboardInterrupt:
             message = "Interrumpido por el usuario con Ctrl+C"
             print(info(f"⏹ {message}", False))

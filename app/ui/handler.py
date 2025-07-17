@@ -5,6 +5,8 @@ Muestra el menu principal y maneja la navegacion
 """
 
 from turtle import update
+
+from colorama import Fore
 from app.services.products import (
     create_product,
     delete_product,
@@ -18,7 +20,7 @@ from app.services.products import (
 )
 from app.ui.config import FAREWELL, MAIN_MENU_OPTIONS, SEARCH_OPTIONS, SYMBOL
 from app.ui.decorators import header
-from app.ui.feedback import show_edit_changes
+from app.ui.feedback import print_data_preview, show_edit_changes
 from app.ui.form import (
     get_category,
     get_price,
@@ -53,12 +55,28 @@ def handle_main_menu(conn, table):
     match selected_option:
         case "Agregar Producto":
             print(header("Agregar Producto", 2) + "\n")
+
             product = ask_new_product_date()
             if product == "previous":
                 return
 
-            create_product(conn, product, table)
-            print("Agregar: ", type(product), " ", product)
+            # Vista
+            # TODO: 🧪para mostar salidas en una estructura definda
+            # print(product)
+            print_data_preview(product, "Vista previa del producto a crear")
+
+            confirm = (
+                input(info(f"\n¿Desea crear el producto '{product['name']}'? (S/n): "))
+                .strip()
+                .lower()
+            )
+            if confirm != "s":
+                print(warning("Creacion de productos cancelada"))
+                return
+
+            message = create_product(conn, product, table)
+            print("\n" + message)
+            # print("Agregar: ", type(product), " ", product)
 
         case "Mostrar Productos":
             print(header("Mostrar Productos", 2) + "\n")
@@ -173,34 +191,38 @@ def ask_new_product_date():
     Returns:
         dict: la entidad...?
     """
+    product = {}
 
-    _, name = get_product_name()
-    if _ == "previous":
+    status, name = get_product_name()
+
+    if status == "previous":
         return "previous"
+    product["name"] = name
+
     _, description = get_product_description()
-    if _ == "previous":
-        return "previous"
-    _, brand = get_product_brand()
-    if _ == "previous":
-        return "previous"
-    _, quantity = get_product_quantity()
-    if _ == "previous":
-        return "previous"
-    _, category = get_category()
-    if _ == "previous":
-        return "previous"
-    _, price = get_price()
-    if _ == "previous":
-        return "previous"
+    product["description"] = description
 
-    return {
-        "name": name,
-        "description": description,
-        "brand": brand,
-        "quantity": quantity,
-        "category": category,
-        "price": price,
-    }
+    status, brand = get_product_brand()
+    if status == "previous":
+        return "previous"
+    product["brand"] = brand
+
+    status, quantity = get_product_quantity()
+    if status == "previous":
+        return "previous"
+    product["quantity"] = quantity
+
+    status, category = get_category()
+    if status == "previous":
+        return "previous"
+    product["category"] = category
+
+    status, price = get_price()
+    if status == "previous":
+        return "previous"
+    product["price"] = price
+
+    return product
 
 
 def ask_product_id():

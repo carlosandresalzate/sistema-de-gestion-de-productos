@@ -9,7 +9,9 @@ Una aplicación de consola en Python para gestionar productos en stock de forma 
 - Buscar productos por ID, nombre o categoría
 - Editar campos seleccionados (descripción, precio, cantidad)
 - Eliminar productos con soft-delete (`is_active = 0`)
-- Mostrar productos en una tabla formateada (centrada y acotada)
+- Mostrar productos en una tabla filtrada (solo columnas clave)
+- Comparar valores originales vs. modificados al editar
+- Previsualizar datos antes de confirmar acciones (agregar/editar)
 - Encabezados y mensajes estilizados con `colorama`
 - Navegación de menús mediante `match` y funciones utilitarias
 
@@ -34,6 +36,7 @@ trabajo_integrador/
 │   │   ├── handler.py            # Controlador general del menú y flujo
 │   │   ├── menu.py               # Menús y navegación
 │   │   ├── message.py            # Mensajes con color y emojis (info, warning, error)
+│   │   ├── feedback.py           # Previsualización y comparación de datos con estilo
 │   │   └── table.py              # Tabla formateada de productos
 │   ├── utils/
 │   │   ├── animation.py          # Animaciones de carga y efecto de salida
@@ -65,6 +68,7 @@ trabajo_integrador/
           4. Eliminar Producto (soft)
           5. Buscar Producto
           6. Salir
+
 ```
 
 **Muestrar  los productos en una tabla**
@@ -97,6 +101,8 @@ trabajo_integrador/
 - Separación clara de responsabilidades: UI, lógica, DB, utils, persistencia
 - Diseño para terminal compacta (máximo 60 columnas)
 - Funciones decoradoras reutilizables para estilo
+- Vista previa y confirmación antes de ejecutar cambios
+- Comparación visual de valores con resaltado de cambios
 - Documentación con Google-style docstrings
 - Uso ético y educativo del conocimiento
 

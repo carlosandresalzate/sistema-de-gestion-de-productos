@@ -319,7 +319,7 @@ def confirm_and_hard_delete_product(conn, table, product_id):
 
     confirm = input(f"¿Estas compeltamente seguro? (s/N)\n{SYMBOL} ").strip().lower()
     if confirm == "s":
-        deleted = hard_delete_product(conn, product, table)
+        deleted = hard_delete_product(conn, product_id, table)
         if deleted:
             message = success(f"Producto '{product[1]}' eliminado permanentemente. ☠️")
             print(message)

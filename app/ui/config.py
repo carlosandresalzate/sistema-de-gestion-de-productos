@@ -14,8 +14,7 @@ MAIN_MENU_OPTIONS = [
     "Agregar Producto",
     "Mostrar Productos",
     "Editar Producto",
-    "Eliminar Producto (soft)",
-    # "Eliminar Producto (hard)", # para borrar de la base de datos totalmente
+    "Eliminar Producto",
     "Buscar Producto",
     "Salir",
 ]
@@ -24,7 +23,13 @@ SEARCH_OPTIONS = [
     "Buscar por ID",
     "Buscar por Nombre",
     "Buscar por Categoria",
-    "Menu Principal",
+    "Volver al Menu Principal",
+]
+
+DELETE_OPTIONS = [
+    "Eliminar Producto (soft)",
+    "Eliminar Producto (hard)",  # para borrar de la base de datos totalmente
+    "Volver al Menu Principal",
 ]
 
 FAREWELL = [

@@ -5,7 +5,11 @@ Set de fuciones CRUD
 """
 
 from datetime import datetime
-from app.ui.message import success, warning
+from email import message
+from os import error
+from app.ui.config import SYMBOL
+from app.ui.decorators import boxed_text
+from app.ui.message import info, success, warning
 
 
 def create_product(conn, product, table):
@@ -214,3 +218,115 @@ def map_products_for_display(products):
         list[tuple]: Lista con tuplas que contienen solo los datos deseados
     """
     return [(p[0], p[1], p[2], p[6], p[4]) for p in products]
+
+
+def confirm_and_delete_product(conn, table, product_id):
+    """
+    Elimina un producto de forma logica (soft delete) con confirmacion previa.
+
+    Busca el producto activo por su ID, lo muestra en formato, solicita confirmacion al usuario y si acepta, marca el producto como inactivo en la base de datos (is_active = 0).
+    Tambien informa al usuario si la operacion  fue exitosa o cancelada.
+
+    Args:
+        conn (sqlite3.Connection): Conexion activa a la base de datos.
+        table (str): Nombre de la tabla donde se encuentra el producto
+        product_id (int): ID del producto a eliminar.
+
+    Returns:
+        bool:
+            - True si el producto fue eliminado correctamente.
+            - False si no se encontro, si hubo error o siel usuario cancelo
+
+    Side Effect:
+        - Muestra mensaje de confirmacion con `print`
+        - Solicita entrada al usuario con `input
+        - Modifica el campo `is_active` y `delete_at` de la base de datos.
+
+    Example:
+        >>> confirm_and_delete_prodouct(conn, "productos", 1) # doctest +Skip
+    """
+    product = search_by_id(conn, table, product_id)
+    if not product_id:
+        message = warning(f"No se encontro ningun producto activo con ID {product_id}")
+        print(message)
+        return False
+
+    # TODO: CAmbiar esta caja por algo mas representativo
+    print(boxed_text(f"Producto a eliminar: {product[1].title()} (ID: {product[0]})"))
+    print(
+        info("¿Deseas Eliminar este producto? Esta accion es reversible (soft delete).")
+    )
+
+    confirm = input(f"Confirmar eleiminacion (s/N):\n{SYMBOL}").strip().lower()
+    if confirm == "s":
+        deleted = delete_product(conn, product_id, table)
+        if deleted:
+            message = success(f"Producto '{product[1]}' eliminado correctamente.")
+        else:
+            message = error("Error al eliminar producto")
+            print(message)
+        return deleted
+    else:
+        message = info("Operación cancelada por el usuario. ↩")
+        print(message)
+        return False
+
+
+def confirm_and_hard_delete_product(conn, table, product_id):
+    """
+    Elimina un producto de forma definitiva (hard delete) tras confirmacion explicita.
+
+    Busca el producto activo por su ID, muestra advertencia en consola y solicita confirmacion. SI el usuario acepta, se borra permanentemente de la tabla.
+    Esta accion no se puede deshacer.
+
+    Args:
+        conn (sqlite3.Connection): Conexcion activa a la base de datos.
+        table (str): Nombre de la tabla en la base de datos.
+        product_id (int): ID del producto a eliminar.
+
+    Returns:
+        bool:
+            - True si el producto fue eliminado permanente mente.
+            - False si no se encontro, hubo error o el usuario concelo.
+
+    Side Effects:
+        - Solicita entrada con `input`
+        - Muestra  mensaje con `print`
+        - Eliminacion definitiva del registro de la tabla.
+
+    Warning:
+        Esta accion borra el producto del sistema de forma irreversible.
+
+    Example:
+        >>> confirm_and_hard_delete_product(conn, "productos", 2) # doctest: +SKIP
+    """
+    product = search_by_id(conn, table, product_id)
+    if not product:
+        message = warning(f"No se encontro ningun producto activo con ID {product_id}.")
+        print(message)
+        return False
+
+    print(
+        boxed_text(
+            f"⚠ Eliminacion permanente del producto: {product[1].title()} (ID: {product[0]})"
+        )
+    )
+    print(
+        warning(
+            "Esta accion no se puede desaccer. El producto sera borrado de la bse de datos."
+        )
+    )
+
+    confirm = input(f"¿Estas compeltamente seguro? (s/N)\n{SYMBOL} ").strip().lower()
+    if confirm == "s":
+        deleted = hard_delete_product(conn, product, table)
+        if deleted:
+            message = success(f"Producto '{product[1]}' eliminado permanentemente. ☠️")
+            print(message)
+        else:
+            message = error("Error al eliminar permanentemente el producto")
+            print(message)
+        return deleted
+    else:
+        message = info("Operacion Cancelada por el usuario. ↩")
+        print(message)

@@ -8,6 +8,8 @@ from turtle import update
 
 from colorama import Fore
 from app.services.products import (
+    confirm_and_delete_product,
+    confirm_and_hard_delete_product,
     create_product,
     delete_product,
     hard_delete_product,
@@ -18,7 +20,13 @@ from app.services.products import (
     search_by_name,
     update_product,
 )
-from app.ui.config import FAREWELL, MAIN_MENU_OPTIONS, SEARCH_OPTIONS, SYMBOL
+from app.ui.config import (
+    DELETE_OPTIONS,
+    FAREWELL,
+    MAIN_MENU_OPTIONS,
+    SEARCH_OPTIONS,
+    SYMBOL,
+)
 from app.ui.decorators import header
 from app.ui.feedback import print_data_preview, show_edit_changes
 from app.ui.form import (
@@ -90,8 +98,6 @@ def handle_main_menu(conn, table):
             product_id = ask_product_id()
             if product_id == "None":
                 return
-            if product_id == "0":
-                return
 
             product = search_by_id(conn, table, product_id)
             if not product:
@@ -123,16 +129,12 @@ def handle_main_menu(conn, table):
             else:
                 print(warning("No se realizaron cambios en la base de datos."))
 
-        case "Eliminar Producto (soft)":
-            product_id = ask_product_id()
-            delete_product(conn, product_id, table)
-            print("eliminar soft: ", product_id)
-
-        case "Eliminar Producto (hard)":
-            product_id = ask_product_id()
-            hard_delete_product(conn, product_id, table)
-            print("Eliminar hard: ", product_id)
-
+        # case "Eliminar Producto (hard)":
+        #     product_id = ask_product_id()
+        #     hard_delete_product(conn, product_id, table)
+        #     print("Eliminar hard: ", product_id)
+        case "Eliminar Producto":
+            product = handle_delete_menu(conn, table)
         case "Buscar Producto":
             product = handle_search_menu(conn, table)
 
@@ -146,6 +148,43 @@ def handle_main_menu(conn, table):
             print(message)
 
     return "continue"
+
+
+def handle_delete_menu(conn, table):
+    """
+    Maneja el submenu de eliminar productos
+
+    Side Effects:
+        - Muestra mensaje en pantalla con `print`
+    """
+    selected_option, _ = show_menu_options(
+        DELETE_OPTIONS, "Eliminar", navigate="previous"
+    )
+    print("selected_option: ", selected_option)
+
+    match selected_option:
+        case "Eliminar Producto (soft)":
+            product_id = ask_product_id()
+            # product id == False | INT | STR el cual llama a la funcion end_program
+            if not product_id:
+                return
+
+            confirm_and_delete_product(conn, table, product_id)
+        case "Eliminar Producto (hard)":
+            product_id = ask_product_id()
+
+            if not product_id:
+                return
+
+            confirm_and_hard_delete_product(conn, table, product_id)
+            # hard_delete_product(conn, product_id, table)
+            print("Eliminar hard: ", product_id)
+
+        case "previous":
+            message = info("↩ Volviendo al menú principal", False)
+            print(message)
+            point_animated(1)
+            return
 
 
 def handle_search_menu(conn, table):
@@ -228,12 +267,18 @@ def ask_new_product_date():
 def ask_product_id():
     """
     ¿?
+    Returns:
+        bool (False): si el usuario ingresa 0
+        int: Si el ID existe
+        str: Cuando se ingresa un ID que no existe
     Side Effects:
         - Pide una entrada al usuario con `input`
         - Muestra mensajes por consola con `print`
 
+
     TODO: faltan validaciones
     """
+    print("ask_product_id()")
     while True:
         try:
             product_id = input(
@@ -241,7 +286,9 @@ def ask_product_id():
             ).strip()
             if product_id.isdigit():
                 if product_id == "0":
-                    return "0"
+                    message = info("↩ Volviendo al menú principal", False)
+                    print(message)
+                    return False
 
                 product_id_to_number = int(product_id)
                 return product_id_to_number
@@ -253,7 +300,7 @@ def ask_product_id():
             end_program(message)
         except EOFError:
             message = "Entrada terminada inesperadamente"
-            print(info(f"\n⏹  {message}"), False)
+            print(info(f"\n⏹  {message}", False))
             end_program(message)
         except ValueError:  # Puede ser que esto aqui este de mas
             message = warning("Debe ser un numero entero")
